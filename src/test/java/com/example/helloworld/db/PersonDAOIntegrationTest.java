@@ -1,7 +1,6 @@
 package com.example.helloworld.db;
 
 import com.example.helloworld.core.Person;
-import com.mysql.cj.conf.PropertyKey;
 import io.dropwizard.testing.junit5.DAOTestExtension;
 import io.dropwizard.testing.junit5.DropwizardExtensionsSupport;
 import org.hibernate.cfg.AvailableSettings;
@@ -36,7 +35,7 @@ public class PersonDAOIntegrationTest {
             .setUrl(MY_SQL_CONTAINER.getJdbcUrl())
             .setUsername(MY_SQL_CONTAINER.getUsername())
             .setPassword(MY_SQL_CONTAINER.getPassword())
-            .setProperty(PropertyKey.enabledTLSProtocols.getKeyName(), "TLSv1.1,TLSv1.2,TLSv1.3")
+            .setProperty("enabledTLSProtocols", "TLSv1.1,TLSv1.2,TLSv1.3")
             .addEntityClass(Person.class)
             .build();
 
