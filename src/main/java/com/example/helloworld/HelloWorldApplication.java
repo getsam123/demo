@@ -6,9 +6,11 @@ import com.example.helloworld.cli.RenderCommand;
 import com.example.helloworld.core.Person;
 import com.example.helloworld.core.Template;
 import com.example.helloworld.core.User;
+import com.example.helloworld.db.BranchDAO;
 import com.example.helloworld.db.PersonDAO;
 import com.example.helloworld.filter.DateRequiredFeature;
 import com.example.helloworld.health.TemplateHealthCheck;
+import com.example.helloworld.resources.BranchResource;
 import com.example.helloworld.resources.FilteredResource;
 import com.example.helloworld.resources.HelloWorldResource;
 import com.example.helloworld.resources.PeopleResource;
@@ -79,9 +81,12 @@ public class HelloWorldApplication extends Application<HelloWorldConfiguration> 
     }
 
     @Override
-    public void run(HelloWorldConfiguration configuration, Environment environment) {
+    public void run(HelloWorldConfiguration configuration, Environment environment) throws Exception{
         final PersonDAO dao = new PersonDAO(hibernateBundle.getSessionFactory());
         final Template template = configuration.buildTemplate();
+        environment.jersey().register(BranchResource.class);
+        final DependencyInjectionBundle dependencyInjectionBundle = new DependencyInjectionBundle();
+        dependencyInjectionBundle.run(configuration, environment);
 
         environment.healthChecks().register("template", new TemplateHealthCheck(template));
         environment.admin().addTask(new EchoTask());
