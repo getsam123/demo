@@ -14,6 +14,7 @@ import com.example.helloworld.resources.HelloWorldResource;
 import com.example.helloworld.resources.PeopleResource;
 import com.example.helloworld.resources.PersonResource;
 import com.example.helloworld.resources.ProtectedResource;
+import com.example.helloworld.resources.SingletonResource;
 import com.example.helloworld.resources.ViewResource;
 import com.example.helloworld.tasks.EchoTask;
 import io.dropwizard.Application;
@@ -33,15 +34,15 @@ import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 
 import java.util.Map;
 
-public class HelloWorldApplication extends Application<HelloWorldConfiguration> {
+public class DemoApplication extends Application<DemoConfiguration> {
     public static void main(String[] args) throws Exception {
-        new HelloWorldApplication().run(args);
+        new DemoApplication().run(args);
     }
 
-    private final HibernateBundle<HelloWorldConfiguration> hibernateBundle =
-        new HibernateBundle<HelloWorldConfiguration>(Person.class) {
+    private final HibernateBundle<DemoConfiguration> hibernateBundle =
+        new HibernateBundle<DemoConfiguration>(Person.class) {
             @Override
-            public DataSourceFactory getDataSourceFactory(HelloWorldConfiguration configuration) {
+            public DataSourceFactory getDataSourceFactory(DemoConfiguration configuration) {
                 return configuration.getDataSourceFactory();
             }
         };
@@ -52,7 +53,7 @@ public class HelloWorldApplication extends Application<HelloWorldConfiguration> 
     }
 
     @Override
-    public void initialize(Bootstrap<HelloWorldConfiguration> bootstrap) {
+    public void initialize(Bootstrap<DemoConfiguration> bootstrap) {
         // Enable variable substitution with environment variables
         bootstrap.setConfigurationSourceProvider(
                 new SubstitutingSourceProvider(
@@ -63,26 +64,27 @@ public class HelloWorldApplication extends Application<HelloWorldConfiguration> 
 
         bootstrap.addCommand(new RenderCommand());
         bootstrap.addBundle(new AssetsBundle());
-        bootstrap.addBundle(new MigrationsBundle<HelloWorldConfiguration>() {
+        bootstrap.addBundle(new MigrationsBundle<DemoConfiguration>() {
             @Override
-            public DataSourceFactory getDataSourceFactory(HelloWorldConfiguration configuration) {
+            public DataSourceFactory getDataSourceFactory(DemoConfiguration configuration) {
                 return configuration.getDataSourceFactory();
             }
         });
         bootstrap.addBundle(hibernateBundle);
-        bootstrap.addBundle(new ViewBundle<HelloWorldConfiguration>() {
+        bootstrap.addBundle(new ViewBundle<DemoConfiguration>() {
             @Override
-            public Map<String, Map<String, String>> getViewConfiguration(HelloWorldConfiguration configuration) {
+            public Map<String, Map<String, String>> getViewConfiguration(DemoConfiguration configuration) {
                 return configuration.getViewRendererConfiguration();
             }
         });
     }
 
     @Override
-    public void run(HelloWorldConfiguration configuration, Environment environment) {
+    public void run(DemoConfiguration configuration, Environment environment) throws Exception {
         final PersonDAO dao = new PersonDAO(hibernateBundle.getSessionFactory());
         final Template template = configuration.buildTemplate();
-
+        final DependencyInjectionBundle dependencyInjectionBundle = new DependencyInjectionBundle();
+        dependencyInjectionBundle.run(configuration, environment);
         environment.healthChecks().register("template", new TemplateHealthCheck(template));
         environment.admin().addTask(new EchoTask());
         environment.jersey().register(DateRequiredFeature.class);
@@ -99,5 +101,6 @@ public class HelloWorldApplication extends Application<HelloWorldConfiguration> 
         environment.jersey().register(new PeopleResource(dao));
         environment.jersey().register(new PersonResource(dao));
         environment.jersey().register(new FilteredResource());
+        environment.jersey().register(SingletonResource.class);
     }
 }

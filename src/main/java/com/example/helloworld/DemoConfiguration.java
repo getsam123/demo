@@ -11,7 +11,10 @@ import javax.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.Map;
 
-public class HelloWorldConfiguration extends Configuration {
+interface DependencyConfig{
+
+}
+public class DemoConfiguration extends Configuration implements DependencyConfig {
     @NotEmpty
     private String template;
 

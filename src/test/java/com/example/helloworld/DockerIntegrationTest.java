@@ -38,8 +38,8 @@ public class DockerIntegrationTest {
 
     private static final String CONFIG_PATH = ResourceHelpers.resourceFilePath("test-docker-example.yml");
 
-    public static final DropwizardAppExtension<HelloWorldConfiguration> APP = new DropwizardAppExtension<>(
-            HelloWorldApplication.class, CONFIG_PATH,
+    public static final DropwizardAppExtension<DemoConfiguration> APP = new DropwizardAppExtension<>(
+            DemoApplication.class, CONFIG_PATH,
             ConfigOverride.config("database.url", MY_SQL_CONTAINER::getJdbcUrl),
             ConfigOverride.config("database.user", MY_SQL_CONTAINER::getUsername),
             ConfigOverride.config("database.password", MY_SQL_CONTAINER::getPassword),

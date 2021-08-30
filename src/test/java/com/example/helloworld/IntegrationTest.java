@@ -34,8 +34,8 @@ class IntegrationTest {
     static Supplier<String> CURRENT_LOG = () -> tempDir.resolve("application.log").toString();
     static Supplier<String> ARCHIVED_LOG = () -> tempDir.resolve("application-%d-%i.log.gz").toString();
 
-    static final DropwizardAppExtension<HelloWorldConfiguration> APP = new DropwizardAppExtension<>(
-            HelloWorldApplication.class, CONFIG_PATH,
+    static final DropwizardAppExtension<DemoConfiguration> APP = new DropwizardAppExtension<>(
+            DemoApplication.class, CONFIG_PATH,
             config("database.url", () -> "jdbc:h2:" + tempDir.resolve("database.h2")),
             config("logging.appenders[1].currentLogFilename", CURRENT_LOG),
             config("logging.appenders[1].archivedLogFilenamePattern", ARCHIVED_LOG)
